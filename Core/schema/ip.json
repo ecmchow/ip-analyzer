@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema://ecmchow/ip-analyzer/ip.json",
+    "type": "object",
+    "properties": {
+        "ip": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "ipv4"
+                },
+                {
+                    "type": "string",
+                    "format": "ipv6"
+                }
+            ]
+        }
+    },
+    "required": [
+        "ip"
+    ],
+    "additionalProperties": false
+}

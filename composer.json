@@ -1,0 +1,62 @@
+{
+    "name": "ecmchow/ip-analyzer",
+    "description": "IP address intelligence service",
+    "version": "1.0.0",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eric Chow",
+            "email": "contact@cmchow.com",
+            "homepage": "https://cmchow.com"
+        }
+    ],
+    "config": {
+        "vendor-dir": "vendor"
+    },
+    "require": {
+        "php": ">=7.4",
+		"ext-curl": "*",
+		"ext-json": "*",
+		"ext-mbstring": "*",
+        "workerman/workerman": "^4.0",
+        "workerman/crontab": "^1.0",
+        "geoip2/geoip2": "^2.12",
+        "opis/json-schema": "^2.3"
+    },
+    "autoload": {
+		"psr-4": {
+			"Core\\": "Core"
+		}
+	},
+    "archive": {
+        "exclude": [".github", ".env", ".git", ".drone.yml", ".gitlab-ci.yml", ".php-cs-fixer.dist.php", "box.json", "phpunit.xml", "/dist", "/vendor", "/test", "/tools", "*.lock", "*.log", "*.mmdb"]
+    },
+    "scripts": {
+        "autoload": "@composer dump-autoload -o",
+        "ipsum": "curl --compressed -o blacklist/ipsum.txt https://raw.githubusercontent.com/stamparm/ipsum/master/ipsum.txt",
+        "build": "php tools/box.phar compile",
+        "pack": "@composer archive --dir dist --file ip-analyzer --format=zip",
+        "style-check": [
+            "php tools/php-cs-fixer-v3.phar fix Core --using-cache=no --diff --dry-run",
+            "php tools/php-cs-fixer-v3.phar fix start-analyzer.php --using-cache=no --diff --dry-run"
+        ],
+        "style-fix": [
+            "php tools/php-cs-fixer-v3.phar fix Core --using-cache=no",
+            "php tools/php-cs-fixer-v3.phar fix start-analyzer.php --using-cache=no"
+        ],
+        "test-unit": "php tools/phpunit-9.5.phar --testsuite core-units",
+        "test-e2e": "test/e2e/test-service.sh -u tools/phpunit-9.5.phar -o test/e2e.log -e start-analyzer.php -p no -c no",
+        "test-e2e:redis": "test/e2e/test-redis.sh -u tools/phpunit-9.5.phar -o test/e2e-redis.log -e start-analyzer.php -p no -c no",
+        "test-build": "test/e2e/test-service.sh -u tools/phpunit-9.5.phar -o test/build.log -e dist/ip-analyzer.phar -p yes -c no",
+        "test-build:redis": "test/e2e/test-redis.sh -u tools/phpunit-9.5.phar -o test/build-redis.log -e dist/ip-analyzer.phar -p yes -c no",
+        "ci-e2e": [
+            "test/e2e/test-service.sh -u tools/phpunit-9.5.phar -o test/e2e.log -e start-analyzer.php -p no -c yes",
+            "test/e2e/test-redis.sh -u tools/phpunit-9.5.phar -o test/e2e-redis.log -e start-analyzer.php -p no -c yes"
+        ],
+        "ci-build": [
+            "test/e2e/test-service.sh -u tools/phpunit-9.5.phar -o test/build.log -e dist/ip-analyzer.phar -p yes -c yes",
+            "test/e2e/test-redis.sh -u tools/phpunit-9.5.phar -o test/build-redis.log -e dist/ip-analyzer.phar -p yes -c yes"
+        ]
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "algorithm": "SHA256",
+    "banner": [
+        "This file is part of the IP Analyzer service.",
+        "",
+        "@license MIT",
+        "(c) 2022 Eric Chow <https://cmchow.com>",
+        "",
+        "License at https://opensource.org/licenses/MIT"
+    ],
+    "base-path": null,
+    "blacklist": [
+        "test",
+        "tools",
+        "ipsum.txt",
+        "vendor/workerman/workerman.log"
+    ],
+    "chmod": "0644",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Php"
+    ],
+    "directories": [
+        "Core",
+        "vendor"
+    ],
+    "files": [
+        "start-analyzer.php"
+    ],
+    "main": "start-analyzer.php",
+    "output": "dist/ip-analyzer.phar"
+}

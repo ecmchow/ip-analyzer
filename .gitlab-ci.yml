@@ -1,0 +1,79 @@
+stages:
+  - test
+
+# Cache libraries in between jobs
+cache:
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - vendor/
+
+variables:
+  MMDB_FILEID: $MMDB_FILEID
+
+# PHP 7.4 
+test:7.4:
+  stage: test
+  image: ecmchow/php-redis:7.4-cli
+  only:
+  - web
+  script:
+    - bash
+    - service redis-server restart
+    - wget -O mmdb/GeoLite2-City.mmdb "https://drive.google.com/uc?export=download&confirm=yes&id=$MMDB_FILEID"
+    - chmod -R +x tools
+    - composer install
+    - tools/php-cs-fixer-v3.phar fix Core --using-cache=no --diff --dry-run --verbose
+    - tools/php-cs-fixer-v3.phar fix start-analyzer.php --using-cache=no --diff --dry-run --verbose
+    - php tools/phpunit-9.5.phar --testsuite core-units
+    - openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com" -keyout test/selfsigned.key -out test/selfsigned.crt
+    - composer run ci-e2e && sleep 0.1
+    - cat test/e2e.log
+    - cat test/e2e-redis.log
+    - composer run build
+    - chmod +x dist/ip-analyzer.phar
+    - composer run ci-build && sleep 0.1
+    - cat test/build.log
+    - cat test/build-redis.log
+  rules:
+    - changes:
+      - '**.env'
+      - '**.phar'
+      - '**.php'
+      - '**.sh'
+      - '**.json'
+      - '**.xml'
+      - '**.yml'
+
+# PHP 8.1
+test:8.1:
+  stage: test
+  image: ecmchow/php-redis:8.1-cli
+  only:
+  - web
+  script:
+    - bash
+    - service redis-server restart
+    - wget -O mmdb/GeoLite2-City.mmdb "https://drive.google.com/uc?export=download&confirm=yes&id=$MMDB_FILEID"
+    - chmod -R +x tools
+    - composer install
+    - tools/php-cs-fixer-v3.phar fix Core --using-cache=no --diff --dry-run --verbose
+    - tools/php-cs-fixer-v3.phar fix start-analyzer.php --using-cache=no --diff --dry-run --verbose
+    - php tools/phpunit-9.5.phar --testsuite core-units
+    - openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com" -keyout test/selfsigned.key -out test/selfsigned.crt
+    - composer run ci-e2e && sleep 0.1
+    - cat test/e2e.log
+    - cat test/e2e-redis.log
+    - composer run build
+    - chmod +x dist/ip-analyzer.phar
+    - composer run ci-build && sleep 0.1
+    - cat test/build.log
+    - cat test/build-redis.log
+  rules:
+    - changes:
+      - '**.env'
+      - '**.phar'
+      - '**.php'
+      - '**.sh'
+      - '**.json'
+      - '**.xml'
+      - '**.yml'

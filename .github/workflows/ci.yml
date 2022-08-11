@@ -1,0 +1,134 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+  push:
+    branches:
+      - 'master'
+    paths:
+      - '**.env'
+      - '**.phar'
+      - '**.php'
+      - '**.sh'
+      - '**.json'
+      - '**.xml'
+      - '**.yml'
+  workflow_dispatch:
+
+jobs:
+  tests:
+    strategy:
+      max-parallel: 2
+      fail-fast: false
+      matrix:
+        include:
+          - operating-system: 'ubuntu-20.04'
+            php-version: '7.4'
+            redis-version: 5
+            job-description: 'lowest supported version'
+
+          - operating-system: 'ubuntu-20.04'
+            php-version: '8.1'
+            redis-version: 6
+            job-description: 'latest supported version'
+
+    name: PHP ${{ matrix.php-version }} - ${{ matrix.job-description }}
+    runs-on: ${{ matrix.operating-system }}
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install wget
+        run: sudo apt install -y wget
+
+      - name: Download test MMDB
+        env:
+          MMDB_FILEID: ${{ secrets.MMDB_FILEID }}
+        run: wget -O mmdb/GeoLite2-City.mmdb "https://drive.google.com/uc?export=download&confirm=yes&id=$MMDB_FILEID"
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: ctype, curl, date, json, mbstring, openssl, pcntl, phar, posix, redis, sodium, xdebug
+          coverage: none
+          tools: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
+        with:
+          redis-version: ${{ matrix.redis-version }}
+
+      - name: Make tools executable
+        run: chmod -R +x tools
+
+      - name: Run coding style check on Core files
+        run: tools/php-cs-fixer-v3.phar fix Core --using-cache=no --diff --dry-run --verbose
+
+      - name: Run coding style check on entry file
+        run: tools/php-cs-fixer-v3.phar fix start-analyzer.php --using-cache=no --diff --dry-run --verbose
+
+      - name: Run unit tests with PHPUnit
+        run: composer run test-unit
+
+      - name: Generate SSL certificates for next step
+        run: openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com" -keyout test/selfsigned.key -out test/selfsigned.crt
+
+      - name: Run e2e tests
+        run: composer run ci-e2e
+
+      - name: Upload e2e test log
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-log-${{ matrix.php-version }}
+          path: ./test/e2e.log
+          retention-days: 7
+
+      - name: Upload Redis e2e test log
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-redis-test-log-${{ matrix.php-version }}
+          path: ./test/e2e-redis.log
+          retention-days: 7
+
+      - name: Run build with Box
+        run: composer run build
+
+      - name: Upload PHAR
+        uses: actions/upload-artifact@v3
+        with:
+          name: phar-snapshot-${{ matrix.php-version }}
+          path: ./dist/ip-analyzer.phar
+          retention-days: 7
+
+      - name: Make PHAR executable
+        run: chmod +x ./dist/ip-analyzer.phar
+
+      - name: Run build test
+        run: composer run ci-build
+
+      - name: Upload build test log
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-test-log-${{ matrix.php-version }}
+          path: ./test/build.log
+          retention-days: 7
+
+      - name: Upload Redis build test log
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-redis-test-log-${{ matrix.php-version }}
+          path: ./test/build-redis.log
+          retention-days: 7

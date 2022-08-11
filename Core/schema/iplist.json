@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema://ecmchow/ip-analyzer/iplist.json",
+    "type": "object",
+    "properties": {
+        "iplist": {
+            "type": "array",
+            "items": {
+                "$ref": "./ip.json#/properties/ip",
+                "minimum": 1,
+                "maximum": 100
+            }
+        }
+    },
+    "required": [
+        "iplist"
+    ],
+    "additionalProperties": false
+}

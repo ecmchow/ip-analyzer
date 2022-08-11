@@ -1,0 +1,97 @@
+kind: pipeline
+type: docker
+name: Unit & Build Test (lowest)
+
+steps:
+- name: test
+  image: ecmchow/php-redis:7.4-cli
+  environment:
+    MMDB_FILEID:
+      from_secret: MMDB_FILEID
+  commands:
+  - bash
+  - service redis-server restart
+  - wget -O mmdb/GeoLite2-City.mmdb "https://drive.google.com/uc?export=download&confirm=yes&id=$${MMDB_FILEID}"
+  - chmod -R +x tools
+  - composer install
+  - tools/php-cs-fixer-v3.phar fix Core --using-cache=no --diff --dry-run --verbose
+  - tools/php-cs-fixer-v3.phar fix start-analyzer.php --using-cache=no --diff --dry-run --verbose
+  - php tools/phpunit-9.5.phar --testsuite core-units
+  - openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com" -keyout test/selfsigned.key -out test/selfsigned.crt
+  - composer run ci-e2e && sleep 0.1
+  - cat test/e2e.log
+  - cat test/e2e-redis.log
+  - composer run build
+  - chmod +x dist/ip-analyzer.phar
+  - composer run ci-build && sleep 0.1
+  - cat test/build.log
+  - cat test/build-redis.log
+
+trigger:
+  event:
+  - push
+  - pull_request
+
+---
+kind: pipeline
+type: docker
+name: Unit & Build Test (latest)
+
+steps:
+- name: test
+  image: ecmchow/php-redis:8.1-cli
+  environment:
+    MMDB_FILEID:
+      from_secret: MMDB_FILEID
+  commands:
+  - bash
+  - service redis-server restart
+  - wget -O mmdb/GeoLite2-City.mmdb "https://drive.google.com/uc?export=download&confirm=yes&id=$${MMDB_FILEID}"
+  - chmod -R +x tools
+  - composer install
+  - tools/php-cs-fixer-v3.phar fix Core --using-cache=no --diff --dry-run --verbose
+  - tools/php-cs-fixer-v3.phar fix start-analyzer.php --using-cache=no --diff --dry-run --verbose
+  - php tools/phpunit-9.5.phar --testsuite core-units
+  - openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com" -keyout test/selfsigned.key -out test/selfsigned.crt
+  - composer run ci-e2e && sleep 0.1
+  - cat test/e2e.log
+  - cat test/e2e-redis.log
+  - composer run build
+  - chmod +x dist/ip-analyzer.phar
+  - composer run ci-build && sleep 0.1
+  - cat test/build.log
+  - cat test/build-redis.log
+
+trigger:
+  event:
+  - push
+  - pull_request
+
+---
+kind: pipeline
+type: docker
+name: CI
+
+steps:
+- name: notify
+  image: plugins/slack
+  settings:
+    webhook:
+      from_secret: SLACK_WEBHOOK
+    template: "*{{#success build.status}}:white_check_mark:{{ else }}:x:{{/success}} {{ uppercasefirst build.event }} {{ uppercase build.status }}* \nProject: `{{ repo.owner }}/{{ repo.name }}` ({{ build.branch }})\nBuild #{{ build.number }} ({{ truncate build.commit 8 }}) by {{ build.author }} \n<{{ build.link }}|Drone CI>"
+  when:
+    status:
+    - success
+    - failure
+
+depends_on:
+- Unit & Build Test (lowest)
+- Unit & Build Test (latest)
+
+trigger:
+  event:
+  - push
+  - pull_request
+  status:  # always run
+  - success
+  - failure
