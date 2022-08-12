@@ -34,6 +34,7 @@
     <li><a href="#introduction">Introduction</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#dependencies">Dependencies</a></li>
+    <li><a href="#quickstart-with-docker">Quickstart with Docker</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
