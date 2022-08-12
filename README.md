@@ -92,7 +92,11 @@ It is designed to be a standalone and portable microservice to provide IP addres
 
 ## Quickstart with Docker
 
+- Clone or download the repository.
+- Create an account with [Maxmind](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en) for the free GeoLite2 database and ensure you have created a license key.
 - Ensure you have [Docker](https://www.docker.com/) installed and running.
+- Set the environment variables ACCOUNT_ID and LICENSE_KEY to your Maxmind account ID and license key, or edit
+    `docker-compose.yml` to set them in the `args` section.
 - Run `docker compose up -d` to start the service.
 - The service will be available at `tcp://localhost:3000/`
 - Example usage:
