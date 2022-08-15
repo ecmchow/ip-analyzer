@@ -90,6 +90,8 @@ It is designed to be a standalone and portable microservice to provide IP addres
 * [Workerman](https://github.com/walkor/workerman) >= 4.0
 * [Maxmind GeoIP2 PHP](https://github.com/maxmind/GeoIP2-php) >= 2.12
 
+<br/>
+
 ## Quickstart with Docker
 
 Copy the example Docker compose file:
@@ -123,6 +125,7 @@ To test the IP Analyzer service, simple run `echo '{"ip":"128.101.101.101"}' | n
 ```json
 {"status":"success","data":{"code":"NA","continent":"North America","iso":"US","country":"United States","isEU":false,"city":"Minneapolis","postal":"55414","div":"Minnesota","divIso":"MN","accuracy":10,"lat":44.9764,"long":-93.224,"timezone":"America\/Chicago"},"message":null}
 ```
+<br/>
 
 
 ## Getting Started
