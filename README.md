@@ -77,7 +77,7 @@ It is designed to be a standalone and portable microservice to provide IP addres
 
 * IPv4/IPv6 geographic intelligence by [Maxmind GeoIP2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en)
 * Auto-reload MMDB database with a scheduled Cron pattern
-* Fallback MMDB if primary MMDB is not readable/available
+* Fallback MMDB if primary MMDB is not readable/available (Optional)
 * IPv4 threat level intelligence by [IPsum](https://github.com/stamparm/ipsum) (Optional)
 * Redis integration/caching (Optional)
 
@@ -101,8 +101,14 @@ GEOIPUPDATE_ACCOUNT_ID=<YOUR_ACCOUNT_ID>
 GEOIPUPDATE_LICENSE_KEY=<YOUR_ACCOUNT_ID>
 ```
 
-You may comment out the **ip_analyzer** service part first, use `docker compose up -d` to start **maxmindinc/geoipupdate** and download the MMDB database. To avoid confusing the env file for docker compose and the IP Analyzer service, copy/rename the [.env.example](.env.example) to `.env.service` and pass it through the Docker volumes:
+You may comment out the **ip_analyzer** service part first, use `docker compose up -d` to start **maxmindinc/geoipupdate** and download the MMDB database. To avoid confusing the env file for docker compose and the IP Analyzer service, copy/rename the [.env.example](.env.example) to `.env.service` and change the listening address to `0.0.0.0`:
+```ini
+ANALYZER_ADDR = "0.0.0.0"
+...
+REDIS_ADDR = "0.0.0.0" ; if you are using Redis
+```
 
+Pass the service env file through the Docker volumes
 ```txt
   ip_analyzer:
   ...
@@ -123,7 +129,7 @@ To test the IP Analyzer service, simple run `echo '{"ip":"128.101.101.101"}' | n
 
 ### Prerequisites
 
-PHP >= 7.4 is required, with optional Sodium extension/OpenSSL support. Linux environment is recommended for production deployment. You may run the service locally on your MacOS/Windows machine for development, Windows with WSL is required to run the Mailer service and development tests. Please also note that this is a PHP CLI application, which does not require a web server or process manager such as PHP-FPM to function.
+PHP >= 7.4 is required, with optional Sodium extension/OpenSSL support. Linux environment is recommended for production deployment. You may run the service locally on your MacOS/Windows machine for development, Windows with WSL is required to run the service and development tests. Please also note that this is a PHP CLI application, which does not require a web server or process manager such as PHP-FPM to function.
 
 The free version of Maxmind GeoIP2 database is named `GeoLite2` which you can download manually or through Maxmind API. To install and update the Maxmind GeoIP2 database automatically, you should request an API key with your [Maxmind](https://www.maxmind.com/en/account) account. After you have acquired an API license key, follow the below steps to configure GeoIP download/update on your server ([Maxmind instructions](https://dev.maxmind.com/geoip/updating-databases?lang=en) for reference)
 
