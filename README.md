@@ -98,7 +98,7 @@ Copy the example Docker compose file:
 Before starting the service, make sure you have a valid account with [Maxmind GeoIP2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en). We will use the [maxmindinc/geoipupdate](https://hub.docker.com/r/maxmindinc/geoipupdate) image to automatically download and update MMDB database. Create an `.env` file for [maxmindinc/geoipupdate](https://hub.docker.com/r/maxmindinc/geoipupdate) docker:
 ```txt
 GEOIPUPDATE_ACCOUNT_ID=<YOUR_ACCOUNT_ID>
-GEOIPUPDATE_LICENSE_KEY=<YOUR_ACCOUNT_ID>
+GEOIPUPDATE_LICENSE_KEY=<YOUR_LICENSE_KEY>
 ```
 
 You may comment out the **ip_analyzer** service part first, use `docker compose up -d` to start **maxmindinc/geoipupdate** and download the MMDB database. To avoid confusing the env file for docker compose and the IP Analyzer service, copy/rename the [.env.example](.env.example) to `.env.service` and change the listening address to `0.0.0.0`:
