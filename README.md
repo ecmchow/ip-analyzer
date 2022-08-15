@@ -34,6 +34,7 @@
     <li><a href="#introduction">Introduction</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#dependencies">Dependencies</a></li>
+    <li><a href="#quickstart-with-docker">Quickstart with Docker</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -89,7 +90,28 @@ It is designed to be a standalone and portable microservice to provide IP addres
 * [Workerman](https://github.com/walkor/workerman) >= 4.0
 * [Maxmind GeoIP2 PHP](https://github.com/maxmind/GeoIP2-php) >= 2.12
 
-<br/>
+## Quickstart with Docker
+
+- Clone or download the repository.
+- Create an account with [Maxmind](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en) for the free GeoLite2 database and ensure you have created a license key.
+- Ensure you have [Docker](https://www.docker.com/) installed and running.
+- Set the environment variables ACCOUNT_ID and LICENSE_KEY to your Maxmind account ID and license key, or edit
+    `docker-compose.yml` to set them in the `args` section.
+- Run `docker compose up -d` to start the service.
+- The service will be available at `tcp://localhost:3000/`
+- Example usage:
+    
+    ```bash
+    $ telnet localhost 3000
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+
+    {"ip":"172.217.16.238"}
+    {"status":"success","data":{"code":"NA","continent":"North America","iso":"US","country":"United States","isEU":false,"city":"","postal":"","div":"","divIso":"","accuracy":1000,"lat":37.751,"long":-97.822,"timezone":"America\/Chicago"},"message":null}^]
+    telnet> q
+    Connection closed.
+    ```
 
 ## Getting Started
 

@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  php:
+    image: php-ip-analyzer
+    build:
+      context: .
+      args:
+        ACCOUNT_ID: ${ACCOUNT_ID}
+        LICENSE_KEY: ${LICENSE_KEY}
+    container_name: ip-analyzer
+    ports:
+        - "3000:3000"
+    deploy:
+      restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 10
+          window: 5s
