@@ -92,26 +92,32 @@ It is designed to be a standalone and portable microservice to provide IP addres
 
 ## Quickstart with Docker
 
-- Clone or download the repository.
-- Create an account with [Maxmind](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en) for the free GeoLite2 database and ensure you have created a license key.
-- Ensure you have [Docker](https://www.docker.com/) installed and running.
-- Set the environment variables ACCOUNT_ID and LICENSE_KEY to your Maxmind account ID and license key, or edit
-    `docker-compose.yml` to set them in the `args` section.
-- Run `docker compose up -d` to start the service.
-- The service will be available at `tcp://localhost:3000/`
-- Example usage:
-    
-    ```bash
-    $ telnet localhost 3000
-    Trying 127.0.0.1...
-    Connected to localhost.
-    Escape character is '^]'.
+Copy the example Docker compose file:
+* [docker-compose.yml](docker-compose.yml)
 
-    {"ip":"172.217.16.238"}
-    {"status":"success","data":{"code":"NA","continent":"North America","iso":"US","country":"United States","isEU":false,"city":"","postal":"","div":"","divIso":"","accuracy":1000,"lat":37.751,"long":-97.822,"timezone":"America\/Chicago"},"message":null}^]
-    telnet> q
-    Connection closed.
-    ```
+Before starting the service, make sure you have a valid account with [Maxmind GeoIP2](https://dev.maxmind.com/geoip/geolite2-free-geolocation-data?lang=en). We will use the [maxmindinc/geoipupdate](https://hub.docker.com/r/maxmindinc/geoipupdate) image to automatically download and update MMDB database. Create an `.env` file for [maxmindinc/geoipupdate](https://hub.docker.com/r/maxmindinc/geoipupdate) docker:
+```txt
+GEOIPUPDATE_ACCOUNT_ID=<YOUR_ACCOUNT_ID>
+GEOIPUPDATE_LICENSE_KEY=<YOUR_ACCOUNT_ID>
+```
+
+You may comment out the **ip_analyzer** service part first, use `docker compose up -d` to start **maxmindinc/geoipupdate** and download the MMDB database. To avoid confusing the env file for docker compose and the IP Analyzer service, copy/rename the [.env.example](.env.example) to `.env.service` and pass it through the Docker volumes:
+
+```txt
+  ip_analyzer:
+  ...
+    volumes:
+      - /usr/share/GeoIP:/usr/share/GeoIP # MMDB directory
+      - /path/to/your/.env.service:/var/www/ip-analyzer/.env # service env file
+```
+
+Un-comment the **ip_analyzer** service part and run `docker compose up -d` again to start the IP Analyzer service. The service will be available at `tcp://localhost:3000/` by default.
+
+To test the IP Analyzer service, simple run `echo '{"ip":"128.101.101.101"}' | nc localhost 3000`, you should see the following response:
+```json
+{"status":"success","data":{"code":"NA","continent":"North America","iso":"US","country":"United States","isEU":false,"city":"Minneapolis","postal":"55414","div":"Minnesota","divIso":"MN","accuracy":10,"lat":44.9764,"long":-93.224,"timezone":"America\/Chicago"},"message":null}
+```
+
 
 ## Getting Started
 

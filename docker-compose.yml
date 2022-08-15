@@ -1,18 +1,35 @@
-version: '3.7'
+version: '3.8'
 services:
-  php:
-    image: php-ip-analyzer
-    build:
-      context: .
-      args:
-        ACCOUNT_ID: ${ACCOUNT_ID}
-        LICENSE_KEY: ${LICENSE_KEY}
-    container_name: ip-analyzer
+  geoipupdate:
+    image: maxmindinc/geoipupdate:v4
+    container_name: geoipupdate
+    restart: always
+    environment:
+      - GEOIPUPDATE_ACCOUNT_ID=${GEOIPUPDATE_ACCOUNT_ID}
+      - GEOIPUPDATE_LICENSE_KEY=${GEOIPUPDATE_LICENSE_KEY}
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-ASN GeoLite2-City GeoLite2-Country
+      - GEOIPUPDATE_FREQUENCY=24 # hours
+    volumes:
+      - /usr/share/GeoIP:/usr/share/GeoIP # MMDB directory
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"                                  
+        max-size: "10m"
+  ip_analyzer:
+    image: ecmchow/ip-analyzer:latest
+    container_name: ip_analyzer
+    restart: always
+    volumes:
+      - /usr/share/GeoIP:/usr/share/GeoIP # MMDB directory
+      - /path/to/your/.env.service:/var/www/ip-analyzer/.env # service env file
+      # - /path/to/blacklist:/var/www/ip-analyzer/blacklist # directory for storing IPsum txt (optional)
+      # - /path/to/mmdb:/var/www/ip-analyzer/mmdb # directory for storing fallback MMDB (optional)
     ports:
-        - "3000:3000"
-    deploy:
-      restart_policy:
-          condition: on-failure
-          delay: 5s
-          max_attempts: 10
-          window: 5s
+      - "3000:3000"
+      # - "6379:6379" # Redis port (optional)
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"                                  
+        max-size: "10m"
