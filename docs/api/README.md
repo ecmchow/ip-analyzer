@@ -165,7 +165,7 @@ Failed Response
 | :--- | :--- | :--- |
 | `iplist` | `array` | an array of IPv4/IPv6 string(s) (max. 100 items) |
 
-Get geo info on an IP address
+Get geo info on a list of IP address
 ```json
 {
     "iplist": [

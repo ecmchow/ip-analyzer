@@ -127,6 +127,8 @@ To test the IP Analyzer service, simple run `echo '{"ip":"128.101.101.101"}' | n
 ```json
 {"status":"success","data":{"code":"NA","continent":"North America","iso":"US","country":"United States","isEU":false,"city":"Minneapolis","postal":"55414","div":"Minnesota","divIso":"MN","accuracy":10,"lat":44.9764,"long":-93.224,"timezone":"America\/Chicago"},"message":null}
 ```
+
+For detailed service env configuration, please visit the [env documentation](docs/env/README.md). You can view all available request and required schema in the [API documentation](docs/api/README.md).
 <br/>
 
 
@@ -134,7 +136,7 @@ To test the IP Analyzer service, simple run `echo '{"ip":"128.101.101.101"}' | n
 
 ### Prerequisites
 
-PHP >= 7.4 is required, with optional Sodium extension/OpenSSL support. Linux environment is recommended for production deployment. You may run the service locally on your MacOS/Windows machine for development, Windows with WSL is required to run the service and development tests. Please also note that this is a PHP CLI application, which does not require a web server or process manager such as PHP-FPM to function.
+For non-Docker installation, PHP >= 7.4 is required, with optional Sodium extension/OpenSSL support. Linux environment is recommended for production deployment. You may run the service locally on your MacOS/Windows machine for development, Windows with WSL is required to run the service and development tests. Please also note that this is a PHP CLI application, which does not require a web server or process manager such as PHP-FPM to function.
 
 The free version of Maxmind GeoIP2 database is named `GeoLite2` which you can download manually or through Maxmind API. To install and update the Maxmind GeoIP2 database automatically, you should request an API key with your [Maxmind](https://www.maxmind.com/en/account) account. After you have acquired an API license key, follow the below steps to configure GeoIP download/update on your server ([Maxmind instructions](https://dev.maxmind.com/geoip/updating-databases?lang=en) for reference)
 
@@ -185,7 +187,8 @@ After finishing Maxmind database setup, you may now install `IP Analyzer` servic
 ### Installation
 
 There are several ways to install IP Analyzer
-* [PHAR package](https://github.com/ecmchow/ip-analyzer/releases) (recommended)
+* [Docker](https://hub.docker.com/r/ecmchow/ip-analyzer) (see above [Quickstart](#quickstart-with-docker))
+* [PHAR package](https://github.com/ecmchow/ip-analyzer/releases) (recommended for non-Docker system)
 * [ZIP release](https://github.com/ecmchow/ip-analyzer/releases) (without vendor and development files)
 * Clone the project
 
@@ -258,7 +261,7 @@ To use IPsum list as a simple IP threat intelligence provider, you may run `comp
 
 Add *sudo* to the following command if the service started/managed by root. To automate and better manage your service on a linux server, please view the [Systemd Service](#systemd-service) section.
 
-Replace `ip-analyzer.phar` with `start-analyzer.php` if you are not using PHAR package
+Replace `ip-analyzer.phar` with `start-analyzer.php` if you are not using PHAR package or running shell inside Docker container.
 
 Start, stop or restart service (-d to daemonize service, i.e. keep running service after you quit terminal)
 ```console
