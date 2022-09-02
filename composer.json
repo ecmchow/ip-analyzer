@@ -1,7 +1,7 @@
 {
     "name": "ecmchow/ip-analyzer",
     "description": "IP address intelligence service",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "project",
     "license": "MIT",
     "authors": [

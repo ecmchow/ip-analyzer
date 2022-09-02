@@ -32,7 +32,7 @@ use Workerman\Crontab\Crontab;
 
 use GeoIp2\Database\Reader as MmdbReader;
 
-const ANALYZER_VERSION = '1.0.0';
+const ANALYZER_VERSION = '1.0.1';
 const ANALYZER_NAME = 'IpAnalyzer';
 
 // init Config and Validator instance
