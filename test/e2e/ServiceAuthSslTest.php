@@ -18,6 +18,49 @@ final class ServiceAuthSslTest extends TestCase {
         return json_decode(file_get_contents(__DIR__ . '/../ip-test-data.json'), true);
     }
 
+    private function assertIpDetails($data) {
+        $this->assertArrayHasKey('country', $data);
+        $this->assertArrayHasKey('isEU', $data);
+        $this->assertArrayHasKey('city', $data);
+        $this->assertArrayHasKey('postal', $data);
+        $this->assertArrayHasKey('div', $data);
+        $this->assertArrayHasKey('divIso', $data);
+        $this->assertArrayHasKey('accuracy', $data);
+        $this->assertArrayHasKey('lat', $data);
+        $this->assertArrayHasKey('long', $data);
+        $this->assertArrayHasKey('timezone', $data);
+
+        $this->assertStringMatchesFormat('%s', $data['country']);
+        $this->assertIsBool($data['isEU']);
+        $this->assertStringMatchesFormat('%s', $data['city']);
+        $this->assertStringMatchesFormat('%S', $data['postal']);
+        $this->assertStringMatchesFormat('%s', $data['div']);
+        $this->assertStringMatchesFormat('%s', $data['divIso']);
+        $this->assertIsNumeric($data['accuracy']);
+        $this->assertIsFloat($data['lat']);
+        $this->assertIsFloat($data['long']);
+        $this->assertMatchesRegularExpression('/[a-zA-Z]+\/[a-zA-Z]+/', $data['timezone']);
+    }
+
+    private function assertIpData($input, $expected) {
+        $this->assertArrayHasKey('status', $input);
+        $this->assertArrayHasKey('data', $input);
+        $this->assertArrayHasKey('message', $input);
+
+        $this->assertEquals($expected['status'], $input['status']);
+        $this->assertIsArray($input['data']);
+        $this->assertEquals($expected['message'], $input['message']);
+
+        if (array_key_exists('country', $expected['data'])) {
+            $data = $input['data'];
+            $this->assertIpDetails($data);
+        } else {
+            foreach ($input['data'] as $ip => $data) {
+                $this->assertIpDetails($data);
+            }
+        }
+    }
+
     public static function setUpBeforeClass(): void {
         // TODO
     }
@@ -170,10 +213,7 @@ final class ServiceAuthSslTest extends TestCase {
      * @dataProvider ipDataProvider
      */
     public function testCanConnectAndAnalyzeIp($input, array $expected): void {
-        $this->assertSame(
-            $expected,
-            self::connect($input)
-        );
+        $this->assertIpData(self::connect($input), $expected);
     }
 
     public function ipDataProvider(): array {
@@ -194,10 +234,7 @@ final class ServiceAuthSslTest extends TestCase {
      * @dataProvider ipListDataProvider
      */
     public function testCanConnectAndAnalyzeIpList($input, array $expected): void {
-        $this->assertSame(
-            $expected,
-            self::connect($input)
-        );
+        $this->assertIpData(self::connect($input), $expected);
     }
 
     public function ipListDataProvider(): array {
