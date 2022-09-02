@@ -224,6 +224,7 @@ class Config {
                         case 'ANALYZER_SSL_KEY':
                         case 'MMDB_DIR':
                         case 'MMDB_FALLBACK':
+                        case 'IPSUM_DIR':
                             if (self::isAbsolutePath($value)) {
                                 // absolute path
                                 self::$env[$key] = $value;
