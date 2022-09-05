@@ -10,7 +10,6 @@
 .DS_Store
 
 # Composer files
-*.lock
 /vendor
 
 # Project files
