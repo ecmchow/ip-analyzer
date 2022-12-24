@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ecmchow/ip-analyzer/actions/"><img src="https://img.shields.io/github/workflow/status/ecmchow/ip-analyzer/CI?style=flat-square&logo=GitHub" alt="GitHub Actions"></a>
+  <a href="https://github.com/ecmchow/ip-analyzer/actions/"><img src="https://img.shields.io/github/actions/workflow/status/ecmchow/ip-analyzer/ci.yml?branch=master&style=flat-square&logo=GitHub" alt="GitHub Actions"></a>
   <a href="https://github.com/ecmchow/ip-analyzer/releases"><img src="https://img.shields.io/github/downloads/ecmchow/ip-analyzer/total?style=flat-square&logo=GitHub" alt="GitHub downloads"></a>
   <a href="https://www.php.net/releases/index.php"><img src="https://img.shields.io/badge/PHP-%3E%3D7.4-%23868eb8?style=flat-square&logo=PHP" alt="minimum PHP version"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License"></a>
